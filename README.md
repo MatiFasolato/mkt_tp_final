@@ -21,8 +21,7 @@ El pipeline completo ingesta datos crudos (desde `raw/`), los transforma usando 
 
 A continuación, se presenta el modelado de la base de datos transaccional (OLTP) original desde donde provienen los datos de la carpeta `raw/`.
 
-_(Asumiendo que guardaste tu imagen `DER.jpg` en una carpeta `assets/` como en el ejemplo)_
-`![Diagrama Entidad Relación](./assets/DER.jpg)`
+![Diagrama Entidad Relación](./assets/DER.png)
 
 ---
 
