@@ -1,0 +1,6 @@
+tienda_sk,store_id,tienda_nombre,geografia_sk,provincia_nombre,city
+-1,-1,N/A,,,
+1,1,Tienda BA,1.0,Buenos Aires,Buenos Aires
+2,2,Tienda CBA,2.0,Córdoba,Córdoba
+3,3,Tienda SF,3.0,Santa Fe,Santa Fe
+4,4,Tienda MZA,4.0,Mendoza,Mendoza
