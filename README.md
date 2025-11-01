@@ -1,47 +1,39 @@
-# TP Final: Ecosistema de Datos de Marketing (EcoBottle)
+# Proyecto Final: Dashboard de Marketing y Negocios Digitales - EcoBottle
 
-Proyecto final para la materia "Introducción al Marketing Online y los Negocios Digitales". El objetivo es diseñar e implementar un mini-ecosistema de datos comercial (online + offline) para la empresa ficticia **EcoBottle**.
+Este repositorio contiene el proyecto final para la materia "Introducción al Marketing Online y los Negocios Digitales". [cite_start]El objetivo es implementar un ecosistema de datos (ETL) y construir un dashboard de reporte comercial.
 
-El pipeline completo ingesta datos crudos (desde `raw/`), los transforma usando Python y Pandas (desde `src/`) para crear un Data Warehouse dimensional (en `DW/`). Finalmente, los datos están listos para presentar los KPIs clave en un dashboard.
+## 1. Dashboards (Resultados)
 
-**Dashboard Final (Looker Studio):** `[...]`
+Los datos procesados se utilizaron para construir tres dashboards en Power BI, enfocados en el análisis comercial y la experiencia del cliente.
+
+**[Ver Dashboard Interactivo]([https://app.powerbi.com/view?r=eyJrIjoiYmU3YjhjZWUtYjZlOC00M2EzLWI0MjMtYjgwMDYyMTE3ZWZhIiwidCI6IjNlMDUxM2Q2LTY4ZmEtNDE2ZS04ZGUxLTZjNWNkYzMxOWZmYSIsImMiOjR9])**
+
+### Dashboard 1: Reporte Comercial
+
+![Dashboard Comercial](assets/dash_comercial.png)
+
+### Dashboard 2: Comparación Negocio ONLINE VS OFFLINE
+
+![Dashboard de las tiendas online y físicas](assets/dash_tiendas.png)
+
+### Dashboard 3: Tráfico web
+
+![Dashboard del NPS y clientes digitales](assets/dash_nps.png)
 
 ---
 
-## Herramientas Utilizadas
+## 2. Instrucciones de Ejecución
+
+Este proyecto utiliza Python para el proceso de ETL (Extract, Transform, Load). Los datos en crudo (`RAW/`) se transforman en un Data Warehouse (`DW/`) listo para ser consumido por Power BI.
+
+**Herramientas Utilizadas**
 
 - **Python 3.10+**
 - **Pandas:** Para toda la lógica de extracción, transformación y carga (ETL).
 - **Git / GitHub:** Para control de versiones y gestión del proyecto.
-- **Looker Studio:** Para la visualización y el dashboard de KPIs.
+- **Power BI:** Para la visualización y el dashboard de KPIs.
 
----
-
-## Diagrama Entidad Relación - OLTP (Fuente)
-
-A continuación, se presenta el modelado de la base de datos transaccional (OLTP) original desde donde provienen los datos de la carpeta `raw/`.
-
-![Diagrama Entidad Relación](./assets/DER.png)
-
----
-
-## Arquitectura del Proyecto
-
-El proyecto sigue una estructura ETL clásica, pero optimizada para este trabajo:
-
-1.  **`raw/`**: Contiene los 13 archivos `.CSV` fuente que simulan la base de datos transaccional (OLTP) de EcoBottle.
-2.  **`src/`**: Contiene toda la lógica de transformación del pipeline, separada en módulos:
-    - **`src/extract.py`**: Función para leer los 13 CSVs desde la carpeta `raw/`.
-    - **`src/transform.py`**: Contiene toda la lógica para limpiar, desnormalizar y construir cada una de las 6 tablas de Dimensión y 6 de Hechos, implementando Surrogate Keys (SKs) y manejando miembros desconocidos.
-    - **`src/load.py`**: Función para guardar los 12 DataFrames transformados en el directorio `DW/`.
-    - **`src/__init__.py`**: Permite que `src/` sea tratado como un paquete de Python.
-3.  **`DW/`**: Es el Data Warehouse (Data Mart) de salida. Los 12 archivos `.CSV` en esta carpeta están limpios, modelados y listos para ser consumidos por Looker Studio.
-4.  **`main.py`**: El script orquestador que llama a las funciones de `extract`, `transform` y `load` en el orden correcto para ejecutar el pipeline completo.
-5.  **`requirements.txt`**: Define las dependencias de Python (ej. `pandas`) necesarias para correr el proyecto.
-
----
-
-## Instrucciones de Ejecución Local
+**Pasos para ejecutar el ETL de manera local:**
 
 Sigue estos pasos para ejecutar el pipeline de transformación ETL en tu máquina:
 
@@ -81,192 +73,311 @@ Sigue estos pasos para ejecutar el pipeline de transformación ETL en tu máquin
 5.  **Verificar la salida:**
     Tras la ejecución, la carpeta `DW/` (Data Warehouse) deberá contener los 12 archivos `.CSV` transformados, listos para subir a Looker Studio.
 
+[cite_start]Al finalizar, la carpeta `DW/` contendrá todos los archivos `.csv` limpios (`dim_customer.csv`, `fact_sales_order.csv`, etc.), listos para ser cargados en Power BI.
+
 ---
 
-## Modelo de Datos (Diccionario de Datos)
+## 3. Modelo de Datos y Diccionario
 
-El Data Warehouse (`DW/`) se compone de un Esquema de Constelación con 6 Dimensiones y 6 Tablas de Hechos.
+El proyecto utiliza un **esquema estrella** donde las tablas de hechos (`fact_`) se conectan con las dimensiones (`dim_`) para permitir el análisis.
 
-### Dimensiones (`DW/`)
+### Diagramas de Estrella
+
+A continuación se presentan los diagramas de estrella para cada tabla de hechos:
+
+**Diagrama de `fact_sales_order`:**
+![Diagrama de Pedidos](assets/schema_sales_order.png)
+
+**Diagrama de `fact_sales_order_item`:**
+![Diagrama de Items del Pedido](assets/schema_sales_order_item.png)
+
+**Diagrama de `fact_payment`:**
+![Diagrama de Pagos](assets/schema_payment.png)
+
+**Diagrama de `fact_shipment`:**
+![Diagrama de Envíos](assets/schema_shipment.png)
+
+**Diagrama de `fact_nps_response`:**
+![Diagrama de NPS](assets/schema_nps.png)
+
+**Diagrama de `fact_web_session`:**
+![Diagrama de Sesiones Web](assets/schema_web_session.png)
+
+### Diccionario de Datos
+
+El Data Warehouse (`DW/`) se compone de 6 Dimensiones y 6 Tablas de Hechos.
+
+#### Dimensiones (`DW/`)
 
 Las dimensiones responden al **quién, qué, dónde y cuándo** del análisis.
 
-#### `Dim_Fecha`
+- **1. dim_calendar**
 
-_(Generada en Python) Contiene todos los atributos de fecha para el análisis. La `fecha_key = 0` representa fechas desconocidas._
+  - **PK (Clave Primaria):** `id` (Tipo: `INT`)
+  - **Atributos:**
+    - `date` (Tipo: `DATE`) - Fecha completa (ej. '2025-01-01').
+    - `day` (Tipo: `INT`) - Día del mes (1-31).
+    - `month` (Tipo: `INT`) - Mes del año (1-12).
+    - `year` (Tipo: `INT`) - Año (ej. 2025).
+    - `day_name` (Tipo: `VARCHAR(20)`) - Nombre del día (ej. 'Wednesday').
+    - `month_name` (Tipo: `VARCHAR(20)`) - Nombre del mes (ej. 'January').
+    - `quarter` (Tipo: `INT`) - Trimestre del año (1-4).
+    - `week_number` (Tipo: `INT`) - Número de semana del año.
+    - `year_month` (Tipo: `CHAR(7)`) - Año y mes (ej. '2025-01').
+    - `is_weekend` (Tipo: `BOOLEAN`) - Verdadero si es Sábado o Domingo.
 
-| Nombre de Columna | Descripción                                             | Tipo de Dato         |
-| :---------------- | :------------------------------------------------------ | :------------------- |
-| **fecha_key**     | **Clave Primaria (PK)** inteligente (Formato YYYYMMDD). | `INT`                |
-| fecha_completa    | La fecha completa.                                      | `DATE` / `TIMESTAMP` |
-| año               | Año (ej. 2024).                                         | `INT`                |
-| mes               | Número de mes (1-12).                                   | `INT`                |
-| mes_nombre        | Nombre del mes (ej. January).                           | `VARCHAR`            |
-| dia               | Número de día (1-31).                                   | `INT`                |
-| dia_semana        | Día de la semana (0=Lunes, 6=Domingo).                  | `INT`                |
-| trimestre         | Trimestre del año (1-4).                                | `INT`                |
+- **2. dim_customer**
 
-#### `Dim_Cliente`
+  - **PK (Clave Primaria):** `id` (Tipo: `INT`)
+  - **Atributos:**
+    - `customer_key` (Clave Natural) (Tipo: `INT`) - ID original del cliente.
+    - `email` (Tipo: `VARCHAR(120)`) - Email único del cliente.
+    - `first_name` (Tipo: `VARCHAR(80)`) - Nombre del cliente.
+    - `last_name` (Tipo: `VARCHAR(80)`) - Apellido del cliente.
+    - `phone` (Tipo: `VARCHAR(30)`) - Teléfono del cliente.
+    - `status` (Tipo: `CHAR(1)`) - Estado ('A' = Activo, 'I' = Inactivo).
+    - `created_at` (Tipo: `TIMESTAMP`) - Fecha de alta del cliente.
 
-_Describe a los clientes. La `cliente_sk = -1` representa clientes desconocidos o anónimos._
+- **3. dim_product**
 
-| Nombre de Columna | Descripción                              | Tipo de Dato   |
-| :---------------- | :--------------------------------------- | :------------- |
-| **cliente_sk**    | **Clave Primaria (PK)** sustituta.       | `INT`          |
-| customer_id       | Clave Natural (NK) del sistema original. | `INT`          |
-| email             | Email del cliente.                       | `VARCHAR(120)` |
-| first_name        | Nombre del cliente.                      | `VARCHAR(80)`  |
-| last_name         | Apellido del cliente.                    | `VARCHAR(80)`  |
-| status            | Estado del cliente (ej. 'A' por Activo). | `CHAR(1)`      |
+  - **PK (Clave Primaria):** `id` (Tipo: `INT`)
+  - **Atributos:**
+    - `product_key` (Clave Natural) (Tipo: `INT`) - ID original del producto.
+    - `sku` (Tipo: `VARCHAR(40)`) - SKU único del producto.
+    - `name` (Tipo: `VARCHAR(120)`) - Nombre del producto (ej. 'Classic A Bottle').
+    - `list_price` (Tipo: `DECIMAL(12, 2)`) - Precio de lista.
+    - `status` (Tipo: `CHAR(1)`) - Estado ('A' = Activo, 'I' = Inactivo).
+    - `created_at` (Tipo: `TIMESTAMP`) - Fecha de creación del producto.
+    - `category_name` (Tipo: `VARCHAR(80)`) - Nombre de la categoría del producto.
+    - `parent_category_name` (Tipo: `VARCHAR(80)`) - Nombre de la categoría padre.
 
-#### `Dim_Canal`
+- **4. dim_address**
 
-_Describe los canales de venta. La `canal_sk = -1` representa canales desconocidos._
+  - **PK (Clave Primaria):** `id` (Tipo: `INT`)
+  - **Atributos:**
+    - `address_key` (Clave Natural) (Tipo: `INT`) - ID original de la dirección.
+    - `line1` (Tipo: `VARCHAR(120)`) - Línea 1 de la dirección.
+    - `line2` (Tipo: `VARCHAR(120)`) - Línea 2 de la dirección.
+    - `city` (Tipo: `VARCHAR(80)`) - Ciudad.
+    - `province_name` (Tipo: `VARCHAR(50)`) - Nombre de la provincia.
+    - `province_code` (Tipo: `VARCHAR(10)`) - Código de provincia.
+    - `postal_code` (Tipo: `VARCHAR(20)`) - Código Postal.
+    - `country_code` (Tipo: `CHAR(2)`) - Código de país.
+    - `created_at` (Tipo: `TIMESTAMP`) - Fecha de creación de la dirección.
 
-| Nombre de Columna | Descripción                                 | Tipo de Dato  |
-| :---------------- | :------------------------------------------ | :------------ |
-| **canal_sk**      | **Clave Primaria (PK)** sustituta.          | `INT`         |
-| channel_id        | Clave Natural (NK) del sistema original.    | `INT`         |
-| code              | Código del canal (ej. 'ONLINE', 'OFFLINE'). | `VARCHAR(20)` |
-| canal_nombre      | Nombre descriptivo del canal.               | `VARCHAR(50)` |
+- **5. dim_store**
 
-#### `Dim_Geografia`
+  - **PK (Clave Primaria):** `id` (Tipo: `INT`)
+  - **Atributos:**
+    - `store_key` (Clave Natural) (Tipo: `INT`) - ID original de la tienda.
+    - `name` (Tipo: "VARCHAR(80)") - Nombre de la tienda.
+    - `line` (Tipo: "VARCHAR(120)") - Dirección (Línea 1).
+    - `city` (Tipo: `VARCHAR(80)`) - Ciudad.
+    - `province_name` (Tipo: `VARCHAR(50)`) - Nombre de la provincia.
+    - `province_code` (Tipo: `VARCHAR(10)`) - Código de provincia.
+    - `postal_code` (Tipo: `VARCHAR(20)`) - Código Postal.
+    - `country_code` (Tipo: `CHAR(2)`) - Código de país.
+    - `created_at` (Tipo: `TIMESTAMP`) - Fecha de creación de la dirección.
 
-_Describe las ubicaciones (direcciones), desnormalizando `address` y `province`. La `geografia_sk = -1` representa ubicaciones desconocidas._
-
-| Nombre de Columna | Descripción                         | Tipo de Dato   |
-| :---------------- | :---------------------------------- | :------------- |
-| **geografia_sk**  | **Clave Primaria (PK)** sustituta.  | `INT`          |
-| address_id        | Clave Natural (NK) de la dirección. | `INT`          |
-| line1             | Línea 1 de la dirección.            | `VARCHAR(120)` |
-| city              | Ciudad.                             | `VARCHAR(80)`  |
-| postal_code       | Código Postal.                      | `VARCHAR(20)`  |
-| provincia_nombre  | Nombre de la provincia.             | `VARCHAR(50)`  |
-| provincia_code    | Código de la provincia.             | `VARCHAR(10)`  |
-
-#### `Dim_Producto`
-
-_Describe los productos, desnormalizando `product` y `product_category`. El `producto_sk = -1` representa productos desconocidos._
-
-| Nombre de Columna | Descripción                               | Tipo de Dato    |
-| :---------------- | :---------------------------------------- | :-------------- |
-| **producto_sk**   | **Clave Primaria (PK)** sustituta.        | `INT`           |
-| product_id        | Clave Natural (NK) del producto.          | `INT`           |
-| sku               | Código SKU del producto.                  | `VARCHAR(40)`   |
-| producto_nombre   | Nombre del producto.                      | `VARCHAR(120)`  |
-| list_price        | Precio de lista del producto.             | `DECIMAL(12,2)` |
-| producto_status   | Estado del producto (ej. 'A' por Activo). | `CHAR(1)`       |
-| categoria_nombre  | Nombre de la categoría del producto.      | `VARCHAR(80)`   |
-
-#### `Dim_Tienda`
-
-_Describe las tiendas físicas. La `tienda_sk = -1` representa "Sin Tienda" (ej. pedidos ONLINE)._
-
-| Nombre de Columna | Descripción                         | Tipo de Dato  |
-| :---------------- | :---------------------------------- | :------------ |
-| **tienda_sk**     | **Clave Primaria (PK)** sustituta.  | `INT`         |
-| store_id          | Clave Natural (NK) de la tienda.    | `INT`         |
-| tienda_nombre     | Nombre de la tienda.                | `VARCHAR(80)` |
-| provincia_nombre  | Provincia donde se ubica la tienda. | `VARCHAR(50)` |
-| city              | Ciudad donde se ubica la tienda.    | `VARCHAR(80)` |
+- **6. dim_channel**
+  - **PK (Clave Primaria):** `id` (Tipo: `INT`)
+  - **Atributos:**
+    - `channel_key` (Clave Natural) (Tipo: `INT`) - ID original del canal.
+    - `code` (Tipo: `VARCHAR(20)`) - Código ('ONLINE', 'OFFLINE').
+    - `name` (Tipo: `VARCHAR(50)`) - Nombre del canal (ej. 'Tienda Online').
 
 ---
 
-### Tablas de Hechos (`DW/`)
+#### Tablas de Hechos (`DW/`)
 
-Las tablas de hechos contienen las **métricas** y las claves foráneas (FKs) que las conectan a las dimensiones.
+Las tablas de hechos contienen las **métricas** (indicadores) y las claves foráneas (FKs) que las conectan a las dimensiones.
 
-#### `Fact_Pedidos`
+- **1. fact_sales_order**
 
-- [cite_start]**Grano:** Una fila por cabecera de pedido (órdenes con status 'PAID' o 'FULFILLED' [cite: 169-170]).
-- [cite_start]**Propósito:** Base para KPIs de Ventas Totales ($M), Ticket Promedio ($K) y Ventas por Provincia [cite: 169-170, 173, 175].
+  - **PK (Clave Primaria):** `id` (Clave Natural) (Tipo: `BIGINT`)
+  - **FK (Claves Foráneas):**
+    - `order_date_id` (Tipo: `INT`) -> se une a `dim_calendar[id]`
+    - `customer_id` (Tipo: `INT`) -> se une a `dim_customer[customer_key]`
+    - `channel_id` (Tipo: `INT`) -> se une a `dim_channel[channel_key]`
+    - `store_id` (Tipo: `INT`) -> se une a `dim_store[store_key]`
+    - `billing_address_id` (Tipo: `INT`) -> se une a `dim_address[address_key]`
+    - `shipping_address_id` (Tipo: `INT`) -> se une a `dim_address[address_key]`
+  - **Atributos:**
+    - `status_order` (Tipo: `VARCHAR(20)`) - Estado del pedido.
+    - `currency_code` (Tipo: `CHAR(3)`) - Moneda.
+  - **Métricas:**
+    - `subtotal` (Tipo: `DECIMAL(12, 2)`) - Monto antes de impuestos.
+    - `tax_amount` (Tipo: `DECIMAL(12, 2)`) - Monto de impuestos.
+    - `shipping_fee` (Tipo: `DECIMAL(12, 2)`) - Costo de envío.
+    - `total_amount` (Tipo: `DECIMAL(12, 2)`) - Monto total pagado.
 
-| Nombre de Columna | Descripción                                   | Tipo de Dato    |
-| :---------------- | :-------------------------------------------- | :-------------- |
-| **pedido_sk**     | **Clave Primaria (PK)** sustituta.            | `INT`           |
-| fecha_key         | Clave Foránea (FK) a `Dim_Fecha`.             | `INT`           |
-| cliente_sk        | Clave Foránea (FK) a `Dim_Cliente`.           | `INT`           |
-| canal_sk          | Clave Foránea (FK) a `Dim_Canal`.             | `INT`           |
-| geografia_sk      | Clave Foránea (FK) a `Dim_Geografia` (envío). | `INT`           |
-| tienda_sk         | Clave Foránea (FK) a `Dim_Tienda`.            | `INT`           |
-| order_id          | Dimensión Degenerada (NK del pedido).         | `BIGINT`        |
-| subtotal          | Métrica: Monto antes de impuestos/envío.      | `DECIMAL(12,2)` |
-| tax_amount        | Métrica: Monto de impuestos.                  | `DECIMAL(12,2)` |
-| shipping_fee      | Métrica: Costo de envío.                      | `DECIMAL(12,2)` |
-| total_amount      | Métrica: Monto total pagado.                  | `DECIMAL(12,2)` |
+- **2. fact_sales_order_item**
 
-#### `Fact_Ventas_Items`
+  - **PK (Clave Primaria):** `id` (Clave Natural) (Tipo: `BIGINT`)
+  - **FK (Claves Foráneas):**
+    - `order_id` (Tipo: `BIGINT`)
+    - `order_date_id` (Tipo: `INT`) -> se une a `dim_calendar[id]`
+    - `product_id` (Tipo: `INT`) -> se une a `dim_product[product_key]`
+    - `customer_id` (Tipo: `INT`) -> se une a `dim_customer[customer_key]`
+    - `channel_id` (Tipo: `INT`) -> se une a `dim_channel[channel_key]`
+    - `store_id` (Tipo: `INT`) -> se une a `dim_store[store_key]`
+  - **Métricas:**
+    - `quantity` (Tipo: `INT`) - Cantidad de unidades vendidas.
+    - `unit_price` (Tipo: `DECIMAL(12, 2)`) - Precio unitario.
+    - `discount_amount` (Tipo: `DECIMAL(12, 2)`) - Monto de descuento.
+    - `line_total` (Tipo: `DECIMAL(12, 2)`) - Total de la línea (qty\*price - disc).
 
-- **Grano:** Una fila por ítem (producto) dentro de un pedido válido.
-- **Propósito:** Base para el KPI de Ranking mensual por Producto.
+- **3. fact_payment**
 
-| Nombre de Columna  | Descripción                                         | Tipo de Dato    |
-| :----------------- | :-------------------------------------------------- | :-------------- |
-| **ventas_item_sk** | **Clave Primaria (PK)** sustituta.                  | `INT`           |
-| fecha_key          | Clave Foránea (FK) a `Dim_Fecha`.                   | `INT`           |
-| producto_sk        | Clave Foránea (FK) a `Dim_Producto`.                | `INT`           |
-| order_item_id      | Dimensión Degenerada (NK del ítem).                 | `BIGINT`        |
-| order_id           | Dimensión Degenerada (NK del pedido).               | `BIGINT`        |
-| quantity           | Métrica: Cantidad de unidades vendidas.             | `INT`           |
-| unit_price         | Métrica: Precio por unidad.                         | `DECIMAL(12,2)` |
-| discount_amount    | Métrica: Descuento aplicado al ítem.                | `DECIMAL(12,2)` |
-| line_total         | Métrica: Total de la línea (cant \* precio - desc). | `DECIMAL(12,2)` |
+  - **PK (Clave Primaria):** `id` (Clave Natural) (Tipo: `BIGINT`)
+  - **FK (Claves Foráneas):**
+    - `paid_at_date_id` (Tipo: `INT`) -> se une a `dim_calendar[id]`
+    - `customer_id` (Tipo: `INT`) -> se une a `dim_customer[customer_key]`
+    - `billing_address_id` (Tipo: `INT`) -> se une a `dim_address[address_key]`
+    - `channel_id` (Tipo: `INT`) -> se une a `dim_channel[channel_key]`
+    - `store_id` (Tipo: `INT`) -> se une a `dim_store[store_key]`
+  - **Atributos (Dimensiones Degeneradas):**
+    - `method` (Tipo: `VARCHAR(20)`) - Método de pago.
+    - `status_payment` (Tipo: `VARCHAR(20)`) - Estado del pago.
+    - `transaction_ref` (Tipo: `VARCHAR(80)`) - Referencia de transacción.
+  - **Métricas:**
+    - `amount` (Tipo: `DECIMAL(12, 2)`) - Monto del pago.
 
-#### `Fact_Pagos`
+- **4. fact_shipment**
 
-- **Grano:** Una fila por transacción de pago.
-- **Propósito:** Análisis financiero y de cobranza.
+  - **PK (Clave Primaria):** `id` (Clave Natural) (Tipo: `BIGINT`)
+  - **FK (Claves Foráneas):**
+    - `shipped_at_date_id` (Tipo: `INT`) -> se une a `dim_calendar[id]`
+    - `delivered_at_date_id` (Tipo: `INT`) -> se une a `dim_calendar[id]`
+    - `customer_id` (Tipo: `INT`) -> se une a `dim_customer[customer_key]`
+    - `shipping_address_id` (Tipo: `INT`) -> se une a `dim_address[address_key]`
+    - `channel_id` (Tipo: `INT`) -> se une a `dim_channel[channel_key]`
+  - **Atributos:**
+    - `carrier` (Tipo: `VARCHAR(40)`) - Transportista.
+    - `tracking_number` (Tipo: `VARCHAR(60)`) - Nro. de seguimiento.
+    - `status` (Tipo: `VARCHAR(20)`) - Estado del envío.
+  - **Métricas:**
+    - `dias_de_entrega` (Tipo: `INT`) - Días calculados (entrega - despacho).
 
-| Nombre de Columna | Descripción                                       | Tipo de Dato    |
-| :---------------- | :------------------------------------------------ | :-------------- |
-| **pago_sk**       | **Clave Primaria (PK)** sustituta.                | `INT`           |
-| fecha_key         | Clave Foránea (FK) a `Dim_Fecha` (fecha de pago). | `INT`           |
-| payment_id        | Dimensión Degenerada (NK del pago).               | `BIGINT`        |
-| order_id          | Dimensión Degenerada (NK del pedido).             | `BIGINT`        |
-| amount            | Métrica: Monto del pago.                          | `DECIMAL(12,2)` |
-| method            | Atributo/Dimensión Degenerada (método).           | `VARCHAR(20)`   |
-| status            | Atributo/Dimensión Degenerada (estado).           | `VARCHAR(20)`   |
+- **5. fact_web_session**
 
-#### `Fact_Envios`
+  - **PK (Clave Primaria):** `id` (Clave Natural) (Tipo: `BIGINT`)
+  - **FK (Claves Foráneas):**
+    - `started_at_date_id` (Tipo: `INT`) -> se une a `dim_calendar[id]`
+    - `ended_at_date_id` (Tipo: `INT`) -> se une a `dim_calendar[id]`
+    - `customer_id` (Tipo: `INT`) -> se une a `dim_customer[customer_key]`
+  - **Atributos:**
+    - `source` (Tipo: `VARCHAR(50)`) - Fuente de tráfico ('ads', 'direct').
+    - `device` (Tipo: `VARCHAR(30)`) - Dispositivo ('mobile', 'desktop').
 
-- **Grano:** Una fila por envío.
-- **Propósito:** Análisis de logística y tiempos de entrega.
+- **6. fact_nps_response**
+  - **PK (Clave Primaria):** `id` (Clave Natural) (Tipo: `BIGINT`)
+  - **FK (Claves Foráneas):**
+    - `responded_at_date_id` (Tipo: `INT`) -> se une a `dim_calendar[id]`
+    - `customer_id` (Tipo: `INT`) -> se une a `dim_customer[customer_key]`
+    - `channel_id` (Tipo: `INT`) -> se une a `dim_channel[channel_key]`
+  - **Métricas:**
+    - `score` (Tipo: `SMALLINT`) - Puntaje de 0 a 10.
 
-| Nombre de Columna   | Descripción                                         | Tipo de Dato  |
-| :------------------ | :-------------------------------------------------- | :------------ |
-| **envio_sk**        | **Clave Primaria (PK)** sustituta.                  | `INT`         |
-| fecha_key_shipped   | FK a `Dim_Fecha` (Rol: Fecha de Despacho).          | `INT`         |
-| fecha_key_delivered | FK a `Dim_Fecha` (Rol: Fecha de Entrega).           | `INT`         |
-| shipment_id         | Dimensión Degenerada (NK del envío).                | `BIGINT`      |
-| order_id            | Dimensión Degenerada (NK del pedido).               | `BIGINT`      |
-| dias_de_entrega     | Métrica: Días entre despacho y entrega (Calculada). | `INT`         |
-| carrier             | Atributo/Dimensión Degenerada (transportista).      | `VARCHAR(40)` |
-| status              | Atributo/Dimensión Degenerada (estado).             | `VARCHAR(20)` |
+---
 
-#### `Fact_Sesiones`
+## Arquitectura del Proyecto
 
-- **Grano:** Una fila por sesión web.
-- [cite_start]**Propósito:** Base para el KPI de Usuarios Activos (nK) [cite: 171-172].
+El proyecto sigue una estructura ETL clásica, pero optimizada para este trabajo:
 
-| Nombre de Columna | Descripción                                          | Tipo de Dato  |
-| :---------------- | :--------------------------------------------------- | :------------ |
-| **session_sk**    | **Clave Primaria (PK)** sustituta.                   | `INT`         |
-| fecha_key         | Clave Foránea (FK) a `Dim_Fecha` (inicio de sesión). | `INT`         |
-| cliente_sk        | Clave Foránea (FK) a `Dim_Cliente`.                  | `INT`         |
-| session_id        | Dimensión Degenerada (NK de la sesión).              | `BIGINT`      |
-| source            | Atributo/Dimensión Degenerada (fuente de tráfico).   | `VARCHAR(50)` |
-| device            | Atributo/Dimensión Degenerada (dispositivo).         | `VARCHAR(30)` |
+1.  **`raw/`**: Contiene los 13 archivos `.CSV` fuente que simulan la base de datos transaccional (OLTP) de EcoBottle.
+2.  **`src/`**: Contiene toda la lógica de transformación del pipeline, separada en módulos:
+    - **`src/extract.py`**: Función para leer los 13 CSVs desde la carpeta `raw/`.
+    - **`src/transform.py`**: Contiene toda la lógica para limpiar, desnormalizar y construir cada una de las 6 tablas de Dimensión y 6 de Hechos.
+    - **`src/load.py`**: Función para guardar los 12 DataFrames transformados en el directorio `DW/`.
+    - **`src/__init__.py`**: Permite que `src/` sea tratado como un paquete de Python.
+3.  **`DW/`**: Es el Data Warehouse (Data Mart) de salida. Los 12 archivos `.CSV` en esta carpeta están limpios, modelados y listos para ser consumidos por Power BI.
+4.  **`main.py`**: El script orquestador que llama a las funciones de `extract`, `transform` y `load` en el orden correcto para ejecutar el pipeline completo.
+5.  **`requirements.txt`**: Define las dependencias de Python (ej. `pandas`) necesarias para correr el proyecto.
 
-#### `Fact_NPS`
+---
 
-- **Grano:** Una fila por respuesta de encuesta NPS.
-- **Propósito:** Base para el KPI de NPS (Net Promoter Score).
+---
 
-| Nombre de Columna | Descripción                                            | Tipo de Dato |
-| :---------------- | :----------------------------------------------------- | :----------- |
-| **nps_sk**        | **Clave Primaria (PK)** sustituta.                     | `INT`        |
-| fecha_key         | Clave Foránea (FK) a `Dim_Fecha` (fecha de respuesta). | `INT`        |
-| cliente_sk        | Clave Foránea (FK) a `Dim_Cliente`.                    | `INT`        |
-| canal_sk          | Clave Foránea (FK) a `Dim_Canal`.                      | `INT`        |
-| nps_id            | Dimensión Degenerada (NK de la respuesta).             | `BIGINT`     |
-| score             | Métrica: Puntaje (0-10) dado por el cliente.           | `SMALLINT`   |
+## 4. Consultas Clave (Medidas DAX)
+
+Para calcular los KPIs solicitados y utilizados en las visualizaciones, se utilizaron las siguientes medidas DAX en Power BI creadas en la tabla de Medidas:
+
+```dax
+--------------------------------------------------
+-- KPIs Principales
+--------------------------------------------------
+
+Ticket Promedio =
+DIVIDE(
+    CALCULATE(
+        SUM(fact_sales_order[total_amount]),
+        fact_sales_order[status_order] IN { "PAID", "FULFILLED" }
+    ),
+    CALCULATE(
+        COUNTROWS(fact_sales_order),
+        fact_sales_order[status_order] IN { "PAID", "FULFILLED" }
+    )
+)
+
+Ventas Totales (Filtradas por Producto) =
+CALCULATE(
+    SUM(fact_sales_order[total_amount]),
+    fact_sales_order_item
+)
+
+--------------------------------------------------
+-- Medidas de NPS
+--------------------------------------------------
+
+NPS =
+VAR Promoters =
+    COUNTROWS(
+        FILTER(
+            fact_nps_response,
+            fact_nps_response[score] >= 9
+        )
+    )
+VAR Detractors =
+    COUNTROWS(
+        FILTER(
+            fact_nps_response,
+            fact_nps_response[score] <= 6
+        )
+    )
+VAR TotalResponses =
+    COUNTROWS(fact_nps_response)
+
+RETURN
+IF(
+    TotalResponses > 0,
+    ( ( Promoters - Detractors ) / TotalResponses ) * 100
+)
+
+Tasa de Promotores =
+DIVIDE(
+    CALCULATE(
+        COUNTROWS(fact_nps_response),
+        fact_nps_response[score] >= 9
+    ),
+    COUNTROWS(fact_nps_response)
+)
+
+Promotores =
+CALCULATE(
+    COUNTROWS(fact_nps_response),
+    fact_nps_response[score] >= 9
+)
+
+Pasivos =
+CALCULATE(
+    COUNTROWS(fact_nps_response),
+    fact_nps_response[score] >= 7 && fact_nps_response[score] <= 8
+)
+
+Detractores =
+CALCULATE(
+    COUNTROWS(fact_nps_response),
+    fact_nps_response[score] <= 6
+)
+```

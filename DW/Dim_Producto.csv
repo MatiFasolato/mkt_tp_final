@@ -1,4 +1,0 @@
-producto_sk,product_id,sku,producto_nombre,list_price,producto_status,categoria_nombre
--1,-1,N/A,,,,
-1,1,ECO-CLASSIC-A,Classic A Bottle,12000.0,A,Classic
-2,2,ECO-SPORT-B,Sport B Bottle,15000.0,A,Sport
