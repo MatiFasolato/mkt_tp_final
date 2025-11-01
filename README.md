@@ -1,6 +1,6 @@
 # Proyecto Final: Dashboard de Marketing y Negocios Digitales - EcoBottle
 
-Este repositorio contiene el proyecto final para la materia "Introducción al Marketing Online y los Negocios Digitales". [cite_start]El objetivo es implementar un ecosistema de datos (ETL) y construir un dashboard de reporte comercial.
+Este repositorio contiene el proyecto final para la materia "Introducción al Marketing Online y los Negocios Digitales".
 
 ## 1. Dashboards (Resultados)
 
@@ -73,7 +73,7 @@ Sigue estos pasos para ejecutar el pipeline de transformación ETL en tu máquin
 5.  **Verificar la salida:**
     Tras la ejecución, la carpeta `DW/` (Data Warehouse) deberá contener los 12 archivos `.CSV` transformados, listos para subir a Looker Studio.
 
-[cite_start]Al finalizar, la carpeta `DW/` contendrá todos los archivos `.csv` limpios (`dim_customer.csv`, `fact_sales_order.csv`, etc.), listos para ser cargados en Power BI.
+Al finalizar, la carpeta `DW/` contendrá todos los archivos `.csv` limpios (`dim_customer.csv`, `fact_sales_order.csv`, etc.), listos para ser cargados en Power BI.
 
 ---
 
@@ -299,92 +299,98 @@ El proyecto sigue una estructura ETL clásica, pero optimizada para este trabajo
 
 ## 4. Consultas Clave (Medidas DAX)
 
-Para calcular los KPIs solicitados y utilizados en las visualizaciones, se utilizaron las siguientes medidas DAX en Power BI creadas en la tabla de Medidas:
+Para calcular los KPIs solicitados y utilizados en las visualizaciones, se crearon las siguientes medidas DAX en la tabla **Medidas** del modelo de Power BI:
 
-1.  **Ticket Promedio:**
+---
 
-`dax
-    Ticket Promedio = 
-    DIVIDE(
-        CALCULATE(
-            SUM(fact_sales_order[total_amount]),
-            fact_sales_order[status_order] IN { "PAID", "FULFILLED" }
-        ),
-        CALCULATE(
-            COUNTROWS(fact_sales_order),
-            fact_sales_order[status_order] IN { "PAID", "FULFILLED" }
-        )
-    )
-    `
-
-2.  **NPS (Score):**
-
-````dax
-    NPS =
-    VAR Promoters =
-        COUNTROWS(
-            FILTER(
-                fact_nps_response,
-                fact_nps_response[score] >= 9
-            )
-        )
-    VAR Detractors =
-        COUNTROWS(
-            FILTER(
-                fact_nps_response,
-                fact_nps_response[score] <= 6
-            )
-        )
-    VAR TotalResponses =
-        COUNTROWS(fact_nps_response)
-
-RETURN
-    IF(
-        TotalResponses > 0,
-        ( ( Promoters - Detractors ) / TotalResponses ) \* 100
-    )
-    ```
-
-3.  **Ventas Totales (Filtradas por Producto):**
-    _(Medida especial para que el filtro de `dim_product` pueda afectar a `fact_sales_order`)_
-
-`dax
-    Ventas Totales (Filtradas por Producto) =
-    CALCULATE(
-        SUM(fact_sales_order[total_amount]),
-        fact_sales_order_item
-    )
-    `
-
-4.  **Medidas de Soporte para NPS:**
-    _(Medidas de conteo para los dashboards de experiencia del cliente)_
+### 1. Ticket Promedio
 
 ```dax
-    Tasa de Promotores =
-    DIVIDE(
-        CALCULATE(
-            COUNTROWS(fact_nps_response),
-            fact_nps_response[score] >= 9
-        ),
-        COUNTROWS(fact_nps_response)
-    )
+Ticket Promedio =
+DIVIDE(
+    CALCULATE(
+        SUM(fact_sales_order[total_amount]),
+        fact_sales_order[status_order] IN { "PAID", "FULFILLED" }
+    ),
+    CALCULATE(
+        COUNTROWS(fact_sales_order),
+        fact_sales_order[status_order] IN { "PAID", "FULFILLED" }
+    )
+)
+```
+
+---
+
+### 2. NPS (Score)
+
+```dax
+NPS =
+VAR Promoters =
+    COUNTROWS(
+        FILTER(
+            fact_nps_response,
+            fact_nps_response[score] >= 9
+        )
+    )
+VAR Detractors =
+    COUNTROWS(
+        FILTER(
+            fact_nps_response,
+            fact_nps_response[score] <= 6
+        )
+    )
+VAR TotalResponses =
+    COUNTROWS(fact_nps_response)
+
+RETURN
+IF(
+    TotalResponses > 0,
+    ((Promoters - Detractors) / TotalResponses) * 100
+)
+```
+
+---
+
+### 3. Ventas Totales (Filtradas por Producto)
+
+```dax
+Ventas Totales (Filtradas por Producto) =
+CALCULATE(
+    SUM(fact_sales_order[total_amount]),
+    fact_sales_order_item
+)
+```
+
+---
+
+### 4. Medidas de Soporte para NPS
+
+```dax
+Tasa de Promotores =
+DIVIDE(
+    CALCULATE(
+        COUNTROWS(fact_nps_response),
+        fact_nps_response[score] >= 9
+    ),
+    COUNTROWS(fact_nps_response)
+)
 
 Promotores =
-    CALCULATE(
-        COUNTROWS(fact_nps_response),
-        fact_nps_response[score] >= 9
-    )
+CALCULATE(
+    COUNTROWS(fact_nps_response),
+    fact_nps_response[score] >= 9
+)
 
 Pasivos =
-    CALCULATE(
-        COUNTROWS(fact_nps_response),
-        fact_nps_response[score] >= 7 && fact_nps_response[score] <= 8
-    )
+CALCULATE(
+    COUNTROWS(fact_nps_response),
+    fact_nps_response[score] >= 7 &&
+    fact_nps_response[score] <= 8
+)
 
 Detractores =
-    CALCULATE(
-        COUNTROWS(fact_nps_response),
-        fact_nps_response[score] <= 6
-    )
-    ```
-````
+CALCULATE(
+    COUNTROWS(fact_nps_response),
+    fact_nps_response[score] <= 6
+)
+```
