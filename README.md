@@ -6,7 +6,7 @@ Este repositorio contiene el proyecto final para la materia "Introducción al Ma
 
 Los datos procesados se utilizaron para construir tres dashboards en Power BI, enfocados en el análisis comercial y la experiencia del cliente.
 
-**[Ver Dashboard Interactivo]([https://app.powerbi.com/view?r=eyJrIjoiYmU3YjhjZWUtYjZlOC00M2EzLWI0MjMtYjgwMDYyMTE3ZWZhIiwidCI6IjNlMDUxM2Q2LTY4ZmEtNDE2ZS04ZGUxLTZjNWNkYzMxOWZmYSIsImMiOjR9])**
+**[Ver Dashboard Interactivo](https://app.powerbi.com/view?r=eyJrIjoiYmU3YjhjZWUtYjZlOC00M2EzLWI0MjMtYjgwMDYyMTE3ZWZhIiwidCI6IjNlMDUxM2Q2LTY4ZmEtNDE2ZS04ZGUxLTZjNWNkYzMxOWZmYSIsImMiOjR9)**
 
 ### Dashboard 1: Reporte Comercial
 
@@ -236,7 +236,7 @@ Las tablas de hechos contienen las **métricas** (indicadores) y las claves for�
     - `billing_address_id` (Tipo: `INT`) -> se une a `dim_address[address_key]`
     - `channel_id` (Tipo: `INT`) -> se une a `dim_channel[channel_key]`
     - `store_id` (Tipo: `INT`) -> se une a `dim_store[store_key]`
-  - **Atributos (Dimensiones Degeneradas):**
+  - **Atributos:**
     - `method` (Tipo: `VARCHAR(20)`) - Método de pago.
     - `status_payment` (Tipo: `VARCHAR(20)`) - Estado del pago.
     - `transaction_ref` (Tipo: `VARCHAR(80)`) - Referencia de transacción.
@@ -297,87 +297,94 @@ El proyecto sigue una estructura ETL clásica, pero optimizada para este trabajo
 
 ---
 
----
-
 ## 4. Consultas Clave (Medidas DAX)
 
 Para calcular los KPIs solicitados y utilizados en las visualizaciones, se utilizaron las siguientes medidas DAX en Power BI creadas en la tabla de Medidas:
 
-```dax
---------------------------------------------------
--- KPIs Principales
---------------------------------------------------
+1.  **Ticket Promedio:**
 
-Ticket Promedio =
-DIVIDE(
-    CALCULATE(
-        SUM(fact_sales_order[total_amount]),
-        fact_sales_order[status_order] IN { "PAID", "FULFILLED" }
-    ),
-    CALCULATE(
-        COUNTROWS(fact_sales_order),
-        fact_sales_order[status_order] IN { "PAID", "FULFILLED" }
-    )
-)
+`dax
+    Ticket Promedio = 
+    DIVIDE(
+        CALCULATE(
+            SUM(fact_sales_order[total_amount]),
+            fact_sales_order[status_order] IN { "PAID", "FULFILLED" }
+        ),
+        CALCULATE(
+            COUNTROWS(fact_sales_order),
+            fact_sales_order[status_order] IN { "PAID", "FULFILLED" }
+        )
+    )
+    `
 
-Ventas Totales (Filtradas por Producto) =
-CALCULATE(
-    SUM(fact_sales_order[total_amount]),
-    fact_sales_order_item
-)
+2.  **NPS (Score):**
 
---------------------------------------------------
--- Medidas de NPS
---------------------------------------------------
-
-NPS =
-VAR Promoters =
-    COUNTROWS(
-        FILTER(
-            fact_nps_response,
-            fact_nps_response[score] >= 9
-        )
-    )
-VAR Detractors =
-    COUNTROWS(
-        FILTER(
-            fact_nps_response,
-            fact_nps_response[score] <= 6
-        )
-    )
-VAR TotalResponses =
-    COUNTROWS(fact_nps_response)
+````dax
+    NPS =
+    VAR Promoters =
+        COUNTROWS(
+            FILTER(
+                fact_nps_response,
+                fact_nps_response[score] >= 9
+            )
+        )
+    VAR Detractors =
+        COUNTROWS(
+            FILTER(
+                fact_nps_response,
+                fact_nps_response[score] <= 6
+            )
+        )
+    VAR TotalResponses =
+        COUNTROWS(fact_nps_response)
 
 RETURN
-IF(
-    TotalResponses > 0,
-    ( ( Promoters - Detractors ) / TotalResponses ) * 100
-)
+    IF(
+        TotalResponses > 0,
+        ( ( Promoters - Detractors ) / TotalResponses ) \* 100
+    )
+    ```
 
-Tasa de Promotores =
-DIVIDE(
-    CALCULATE(
-        COUNTROWS(fact_nps_response),
-        fact_nps_response[score] >= 9
-    ),
-    COUNTROWS(fact_nps_response)
-)
+3.  **Ventas Totales (Filtradas por Producto):**
+    _(Medida especial para que el filtro de `dim_product` pueda afectar a `fact_sales_order`)_
+
+`dax
+    Ventas Totales (Filtradas por Producto) =
+    CALCULATE(
+        SUM(fact_sales_order[total_amount]),
+        fact_sales_order_item
+    )
+    `
+
+4.  **Medidas de Soporte para NPS:**
+    _(Medidas de conteo para los dashboards de experiencia del cliente)_
+
+```dax
+    Tasa de Promotores =
+    DIVIDE(
+        CALCULATE(
+            COUNTROWS(fact_nps_response),
+            fact_nps_response[score] >= 9
+        ),
+        COUNTROWS(fact_nps_response)
+    )
 
 Promotores =
-CALCULATE(
-    COUNTROWS(fact_nps_response),
-    fact_nps_response[score] >= 9
-)
+    CALCULATE(
+        COUNTROWS(fact_nps_response),
+        fact_nps_response[score] >= 9
+    )
 
 Pasivos =
-CALCULATE(
-    COUNTROWS(fact_nps_response),
-    fact_nps_response[score] >= 7 && fact_nps_response[score] <= 8
-)
+    CALCULATE(
+        COUNTROWS(fact_nps_response),
+        fact_nps_response[score] >= 7 && fact_nps_response[score] <= 8
+    )
 
 Detractores =
-CALCULATE(
-    COUNTROWS(fact_nps_response),
-    fact_nps_response[score] <= 6
-)
-```
+    CALCULATE(
+        COUNTROWS(fact_nps_response),
+        fact_nps_response[score] <= 6
+    )
+    ```
+````
