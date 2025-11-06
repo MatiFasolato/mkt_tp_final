@@ -2,6 +2,8 @@
 
 Este repositorio contiene el proyecto final para la materia "Introducción al Marketing Online y los Negocios Digitales".
 
+**Autor:** Fasolato, Matías
+
 ## 1. Dashboards (Resultados)
 
 Los datos procesados se utilizaron para construir tres dashboards en Power BI, enfocados en el análisis comercial y la experiencia del cliente.
